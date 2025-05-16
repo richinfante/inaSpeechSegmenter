@@ -62,7 +62,7 @@ CLASSIFIERS=[
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10', 
+    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Topic :: Multimedia :: Sound/Audio',
@@ -77,7 +77,7 @@ CLASSIFIERS=[
 ]
 
 DESCRIPTION='CNN-based audio segmentation toolkit. Does voice activity detection, speech detection, music detection, noise detection, speaker gender recognition.'
-LONGDESCRIPTION='''Split audio signal into homogeneous zones of speech, music and noise. Then detects speaker gender.  
+LONGDESCRIPTION='''Split audio signal into homogeneous zones of speech, music and noise. Then detects speaker gender.
 
 inaSpeechSegmenter has been presented at the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) 2018 conference in Calgary, Canada. If you use this toolbox in your research, you can cite the following work in your publications :
 
@@ -92,9 +92,9 @@ inaSpeechSegmenter has been presented at the IEEE International Conference on Ac
 }
 ```
 
-inaSpeechSegmenter won MIREX 2018 speech detection challenge.  
-http://www.music-ir.org/mirex/wiki/2018:Music_and_or_Speech_Detection_Results  
-Details on the speech detection submodule can be found bellow:  
+inaSpeechSegmenter won MIREX 2018 speech detection challenge.
+http://www.music-ir.org/mirex/wiki/2018:Music_and_or_Speech_Detection_Results
+Details on the speech detection submodule can be found bellow:
 
 
 ```bibtex
@@ -107,19 +107,6 @@ Details on the speech detection submodule can be found bellow:
 ```
 '''
 
-platform_dependent_packages = []
-
-if sys.platform == 'darwin':
-  platform_dependent_packages.append('tensorflow')
-
-  if platform.machine() == 'arm64':
-    platform_dependent_packages.append('onnxruntime-silicon')
-  else:
-    platform_dependent_packages.append('onnxruntime')
-else:
-  platform_dependent_packages.append('tensorflow[and-cuda]')
-  platform_dependent_packages.append('onnxruntime-gpu')
-
 requirements = [
   'numpy',
   'pandas',
@@ -129,8 +116,13 @@ requirements = [
   'Pyro4',
   'pytextgrid',
   'soundfile',
-  *platform_dependent_packages,
-  #'torch',
+  'tensorflow; sys_platform == "darwin"',
+  # NOTE: onnxruntime-silicon only supports python_version <3.12, prevent installing on later versions
+  'onnxruntime-silicon; sys_platform == "darwin" and platform_machine == "arm64" and python_version < "3.12"',
+  'onnxruntime; sys_platform == "darwin" and platform_machine != "arm64"',
+  'tensorflow[and-cuda]; sys_platform != "darwin"',
+  'onnxruntime-gpu; sys_platform != "darwin"',
+  # 'torch',
 ]
 
 setup(
