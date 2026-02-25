@@ -116,14 +116,26 @@ requirements = [
   'Pyro4',
   'pytextgrid',
   'soundfile',
-  'tensorflow; sys_platform == "darwin"',
-  # NOTE: onnxruntime-silicon only supports python_version <3.12, prevent installing on later versions
-  'onnxruntime-silicon; sys_platform == "darwin" and platform_machine == "arm64" and python_version < "3.12"',
-  'onnxruntime; sys_platform == "darwin" and platform_machine != "arm64"',
-  'tensorflow[and-cuda]; sys_platform != "darwin"',
-  'onnxruntime-gpu; sys_platform != "darwin"',
-  # 'torch',
 ]
+
+extras_require = {
+    # CPU runtime (default for Lambda, most servers)
+    "cpu": [
+        # macOS
+        'tensorflow; sys_platform == "darwin"',
+        'onnxruntime-silicon; sys_platform == "darwin" and platform_machine == "arm64" and python_version < "3.12"',
+        'onnxruntime; sys_platform == "darwin" and platform_machine != "arm64"',
+
+        # Linux CPU
+        'onnxruntime; sys_platform == "linux"',
+    ],
+
+    # GPU runtime (explicit opt-in)
+    "gpu": [
+        'tensorflow[and-cuda]; sys_platform == "linux" and platform_machine == "x86_64"',
+        'onnxruntime-gpu; sys_platform == "linux" and platform_machine == "x86_64"',
+    ],
+}
 
 setup(
     name = "inaSpeechSegmenter",
@@ -135,6 +147,7 @@ setup(
     description = DESCRIPTION,
     license = "MIT",
     install_requires=requirements,
+    extras_require=extras_require,
  #   keywords = "example documentation tutorial",
     url = "https://github.com/ina-foss/inaSpeechSegmenter",
 #    packages=['inaSpeechSegmenter'],
